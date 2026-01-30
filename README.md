@@ -2,7 +2,11 @@
 
 > 一个兼容 Deno 和 Bun 的服务容器（依赖注入）工具库，提供单例、多例、作用域、工厂模式等服务管理功能
 
-## 功能
+[![JSR](https://jsr.io/badges/@dreamer/service)](https://jsr.io/@dreamer/service)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests: 56 passed](https://img.shields.io/badge/Tests-56%20passed-brightgreen)](./TEST_REPORT.md)
+
+## 🎯 功能
 
 服务容器（依赖注入）工具库，用于管理应用中的服务和依赖关系。
 
@@ -26,6 +30,14 @@
   - 服务替换和覆盖
   - 服务移除和清空
   - 服务发现（获取所有已注册的服务）
+  - 服务元数据获取（getServiceInfo）
+  - 按生命周期筛选服务（getServicesByLifetime）
+- **安全获取**：
+  - tryGet：安全获取服务，不抛出错误
+  - getOrDefault：带默认值的服务获取
+- **改进的错误处理**：
+  - 工厂函数错误包装，提供更好的调试信息
+  - 支持工厂函数返回 undefined/null/0/空字符串
 - **依赖注入**：
   - 手动服务依赖注入
   - 服务间依赖关系管理
@@ -75,7 +87,7 @@ bunx jsr add @dreamer/service
 
 ## 🌍 环境兼容性
 
-- **运行时要求**：Deno 2.5+ 或 Bun 1.0+
+- **运行时要求**：Deno 2.6+ 或 Bun 1.3.5
 - **服务端**：✅ 支持（兼容 Deno 和 Bun 运行时，服务容器/依赖注入是服务端概念）
 - **客户端**：❌ 不支持（浏览器环境，服务容器/依赖注入是服务端架构模式，客户端不需要）
 - **依赖**：无外部依赖（纯 TypeScript 实现）
@@ -411,16 +423,108 @@ if (container.has("userService")) {
 }
 ```
 
-##### `remove(name: string): void`
+##### `remove(name: string): boolean`
 
-移除服务。
+移除服务。支持通过主名称或别名移除。
+
+**参数**：
+- `name: string` - 服务名称或别名
+
+**返回**：是否成功移除
+
+**示例**：
+```typescript
+const success = container.remove("userService");
+console.log(success); // true
+
+// 也可以通过别名移除
+container.remove("userServiceAlias");
+```
+
+##### `tryGet<T>(name: string, ...args: unknown[]): T | undefined`
+
+安全获取服务（不抛出错误）。如果服务不存在或创建失败，返回 undefined。
+
+**参数**：
+- `name: string` - 服务名称
+- `...args: unknown[]` - 工厂函数的参数（仅用于 factory 类型）
+
+**返回**：服务实例或 undefined
+
+**示例**：
+```typescript
+const service = container.tryGet("userService");
+if (service) {
+  // 服务存在
+}
+
+// 对比 get()，tryGet 不会抛出错误
+const result = container.tryGet("nonexistent"); // undefined
+```
+
+##### `getOrDefault<T>(name: string, defaultValue: T, ...args: unknown[]): T`
+
+获取服务，如果不存在则返回默认值。
+
+**参数**：
+- `name: string` - 服务名称
+- `defaultValue: T` - 默认值
+- `...args: unknown[]` - 工厂函数的参数（仅用于 factory 类型）
+
+**返回**：服务实例或默认值
+
+**示例**：
+```typescript
+const logger = container.getOrDefault("logger", new ConsoleLogger());
+```
+
+##### `getServiceInfo(name: string): ServiceInfo | undefined`
+
+获取服务元数据信息。
 
 **参数**：
 - `name: string` - 服务名称
 
+**返回**：服务信息，如果服务不存在返回 undefined
+
 **示例**：
 ```typescript
-container.remove("userService");
+const info = container.getServiceInfo("userService");
+if (info) {
+  console.log(info.name);       // "userService"
+  console.log(info.lifetime);   // "singleton"
+  console.log(info.aliases);    // ["userSvc"]
+  console.log(info.hasInstance); // true（如果已创建实例）
+}
+```
+
+##### `getAllServiceInfo(): ServiceInfo[]`
+
+获取所有服务的元数据信息。
+
+**返回**：服务信息数组
+
+**示例**：
+```typescript
+const allInfo = container.getAllServiceInfo();
+allInfo.forEach(info => {
+  console.log(`${info.name} (${info.lifetime})`);
+});
+```
+
+##### `getServicesByLifetime(lifetime: ServiceLifetime): string[]`
+
+获取指定生命周期类型的所有服务名称。
+
+**参数**：
+- `lifetime: ServiceLifetime` - 服务生命周期类型
+
+**返回**：服务名称数组
+
+**示例**：
+```typescript
+const singletons = container.getServicesByLifetime("singleton");
+console.log(singletons); // ["database", "config", ...]
 ```
 
 ##### `createScope(): IServiceScope`
@@ -511,6 +615,23 @@ container.replace("userService", "singleton", () => new NewUserService());
 type ServiceLifetime = "singleton" | "transient" | "scoped" | "factory";
 ```
 
+#### `ServiceInfo`
+
+服务信息接口（元数据）。
+
+```typescript
+interface ServiceInfo {
+  /** 服务名称 */
+  name: string;
+  /** 服务生命周期 */
+  lifetime: ServiceLifetime;
+  /** 服务别名 */
+  aliases: string[];
+  /** 是否已创建实例（仅 singleton 有效） */
+  hasInstance: boolean;
+}
+```
+
 #### `IServiceScope`
 
 作用域接口。
@@ -535,6 +656,20 @@ interface IServiceScope {
 ```typescript
 const container = createServiceContainer();
 ```
+
+## 📊 测试报告
+
+| 项目 | 数值 |
+|------|------|
+| 总测试数 | 56 |
+| 通过 | 56 |
+| 失败 | 0 |
+| 通过率 | 100% |
+| 测试时间 | 2026-01-30 |
+
+详细测试报告请查看 [TEST_REPORT.md](./TEST_REPORT.md)
+
+---
 
 ## 📝 备注
 

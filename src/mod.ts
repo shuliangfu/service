@@ -39,7 +39,27 @@
 export type ServiceLifetime = "singleton" | "transient" | "scoped" | "factory";
 
 /**
- * 服务注册信息
+ * 未创建实例的标记符号
+ * 用于区分 undefined/null 值和未创建状态
+ */
+const NOT_CREATED = Symbol("NOT_CREATED");
+
+/**
+ * 服务信息接口（对外暴露的元数据）
+ */
+export interface ServiceInfo {
+  /** 服务名称 */
+  name: string;
+  /** 服务生命周期 */
+  lifetime: ServiceLifetime;
+  /** 服务别名 */
+  aliases: string[];
+  /** 是否已创建实例（仅 singleton 有效） */
+  hasInstance: boolean;
+}
+
+/**
+ * 服务注册信息（内部使用）
  */
 interface ServiceRegistration<T = unknown> {
   /** 服务名称 */
@@ -48,8 +68,8 @@ interface ServiceRegistration<T = unknown> {
   lifetime: ServiceLifetime;
   /** 工厂函数（用于创建服务实例） */
   factory: (...args: unknown[]) => T;
-  /** 服务实例（仅用于 singleton） */
-  instance?: T;
+  /** 服务实例（仅用于 singleton），使用 Symbol 标记未创建状态 */
+  instance: T | typeof NOT_CREATED;
   /** 服务别名 */
   aliases?: string[];
 }
@@ -171,6 +191,7 @@ export class ServiceContainer {
       name,
       lifetime,
       factory: factory as (...args: unknown[]) => T,
+      instance: NOT_CREATED, // 使用 Symbol 标记未创建状态
       aliases,
     };
 
@@ -220,16 +241,40 @@ export class ServiceContainer {
   }
 
   /**
+   * 调用工厂函数并包装错误
+   * 提供更好的错误追踪信息
+   */
+  private invokeFactory<T>(
+    registration: ServiceRegistration<T>,
+    ...args: unknown[]
+  ): T {
+    try {
+      return registration.factory(...args) as T;
+    } catch (error) {
+      // 包装错误，添加服务名称信息
+      const message = error instanceof Error ? error.message : String(error);
+      const wrappedError = new Error(
+        `服务 "${registration.name}" 创建失败: ${message}`,
+      );
+      if (error instanceof Error && error.stack) {
+        wrappedError.stack = error.stack;
+      }
+      throw wrappedError;
+    }
+  }
+
+  /**
    * 获取单例服务
+   * 使用 Symbol 标记未创建状态，支持工厂函数返回 undefined/null
    */
   private getSingleton<T>(registration: ServiceRegistration<T>): T {
-    // 如果已有实例，直接返回
-    if (registration.instance !== undefined) {
+    // 如果已有实例（不是未创建标记），直接返回
+    if (registration.instance !== NOT_CREATED) {
       return registration.instance as T;
     }
 
     // 创建新实例并缓存
-    const instance = registration.factory() as T;
+    const instance = this.invokeFactory<T>(registration);
     registration.instance = instance;
     return instance;
   }
@@ -239,7 +284,7 @@ export class ServiceContainer {
    */
   private getTransient<T>(registration: ServiceRegistration<T>): T {
     // 每次创建新实例
-    return registration.factory() as T;
+    return this.invokeFactory<T>(registration);
   }
 
   /**
@@ -267,7 +312,7 @@ export class ServiceContainer {
     }
 
     // 创建新实例并存储在作用域内
-    const instance = registration.factory() as T;
+    const instance = this.invokeFactory<T>(registration);
     scopeInstances.set(registration.name, instance);
     return instance;
   }
@@ -280,7 +325,7 @@ export class ServiceContainer {
     ...args: unknown[]
   ): T {
     // 使用工厂函数创建实例（可以传入参数）
-    return registration.factory(...args) as T;
+    return this.invokeFactory<T>(registration, ...args);
   }
 
   /**
@@ -303,41 +348,75 @@ export class ServiceContainer {
   }
 
   /**
-   * 移除服务
+   * 尝试获取服务（安全版本，不抛出错误）
+   * 如果服务不存在，返回 undefined
    *
    * @param name 服务名称
+   * @param args 工厂函数的参数（仅用于 factory 类型）
+   * @returns 服务实例或 undefined
    */
-  remove(name: string): void {
+  tryGet<T = unknown>(name: string, ...args: unknown[]): T | undefined {
+    if (!this.has(name)) {
+      return undefined;
+    }
+
+    try {
+      return this.get<T>(name, ...args);
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
+   * 获取服务，如果不存在则返回默认值
+   *
+   * @param name 服务名称
+   * @param defaultValue 默认值
+   * @param args 工厂函数的参数（仅用于 factory 类型）
+   * @returns 服务实例或默认值
+   */
+  getOrDefault<T = unknown>(name: string, defaultValue: T, ...args: unknown[]): T {
+    const result = this.tryGet<T>(name, ...args);
+    return result !== undefined ? result : defaultValue;
+  }
+
+  /**
+   * 移除服务
+   * 支持通过主名称或别名移除服务
+   *
+   * @param name 服务名称或别名
+   * @returns 是否成功移除
+   */
+  remove(name: string): boolean {
     if (!this.services.has(name)) {
-      return;
+      return false;
     }
 
     const registration = this.services.get(name)!;
+    const mainName = registration.name;
 
     // 移除主服务
-    this.services.delete(name);
+    this.services.delete(mainName);
 
-    // 移除别名
+    // 移除所有别名
     if (registration.aliases) {
       for (const alias of registration.aliases) {
         this.services.delete(alias);
       }
     }
 
-    // 如果是单例，清理实例
+    // 如果是单例，重置为未创建状态
     if (registration.lifetime === "singleton") {
-      registration.instance = undefined;
+      registration.instance = NOT_CREATED;
     }
 
-    // 清理所有作用域中的实例
+    // 清理所有作用域中的实例（使用主名称）
     for (const scopeInstances of this.scopedInstances.values()) {
-      scopeInstances.delete(name);
-      if (registration.aliases) {
-        for (const alias of registration.aliases) {
-          scopeInstances.delete(alias);
-        }
-      }
+      scopeInstances.delete(mainName);
+      // 别名在作用域中不会单独存储，因为都指向同一个 registration
     }
+
+    return true;
   }
 
   /**
@@ -395,6 +474,73 @@ export class ServiceContainer {
       }
     }
     return Array.from(serviceNames);
+  }
+
+  /**
+   * 获取服务元数据信息
+   *
+   * @param name 服务名称
+   * @returns 服务信息，如果服务不存在返回 undefined
+   */
+  getServiceInfo(name: string): ServiceInfo | undefined {
+    if (!this.services.has(name)) {
+      return undefined;
+    }
+
+    const registration = this.services.get(name)!;
+    return {
+      name: registration.name,
+      lifetime: registration.lifetime,
+      aliases: registration.aliases ? [...registration.aliases] : [],
+      hasInstance: registration.lifetime === "singleton" &&
+        registration.instance !== NOT_CREATED,
+    };
+  }
+
+  /**
+   * 获取所有服务的元数据信息
+   *
+   * @returns 服务信息数组
+   */
+  getAllServiceInfo(): ServiceInfo[] {
+    // 使用 Set 去重（因为别名和主名指向同一个注册信息）
+    const seen = new Set<string>();
+    const result: ServiceInfo[] = [];
+
+    for (const [, registration] of this.services.entries()) {
+      if (!seen.has(registration.name)) {
+        seen.add(registration.name);
+        result.push({
+          name: registration.name,
+          lifetime: registration.lifetime,
+          aliases: registration.aliases ? [...registration.aliases] : [],
+          hasInstance: registration.lifetime === "singleton" &&
+            registration.instance !== NOT_CREATED,
+        });
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * 获取指定生命周期类型的所有服务名称
+   *
+   * @param lifetime 服务生命周期类型
+   * @returns 服务名称数组
+   */
+  getServicesByLifetime(lifetime: ServiceLifetime): string[] {
+    const result: string[] = [];
+    const seen = new Set<string>();
+
+    for (const [, registration] of this.services.entries()) {
+      if (registration.lifetime === lifetime && !seen.has(registration.name)) {
+        seen.add(registration.name);
+        result.push(registration.name);
+      }
+    }
+
+    return result;
   }
 
   /**

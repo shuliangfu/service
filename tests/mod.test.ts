@@ -430,3 +430,356 @@ describe("createServiceContainer", () => {
     expect(container.get).toBeDefined();
   });
 });
+
+// ============ 新功能测试 ============
+
+describe("单例 undefined/null 支持", () => {
+  it("应该支持工厂函数返回 undefined", () => {
+    const container = new ServiceContainer();
+    let callCount = 0;
+
+    container.registerSingleton("test", () => {
+      callCount++;
+      return undefined;
+    });
+
+    const instance1 = container.get("test");
+    const instance2 = container.get("test");
+
+    expect(instance1).toBeUndefined();
+    expect(instance2).toBeUndefined();
+    expect(callCount).toBe(1); // 只调用一次，不会因为返回 undefined 而重复创建
+  });
+
+  it("应该支持工厂函数返回 null", () => {
+    const container = new ServiceContainer();
+    let callCount = 0;
+
+    container.registerSingleton("test", () => {
+      callCount++;
+      return null;
+    });
+
+    const instance1 = container.get("test");
+    const instance2 = container.get("test");
+
+    expect(instance1).toBeNull();
+    expect(instance2).toBeNull();
+    expect(callCount).toBe(1); // 只调用一次
+  });
+
+  it("应该支持工厂函数返回 0 或空字符串", () => {
+    const container = new ServiceContainer();
+
+    container.registerSingleton("zero", () => 0);
+    container.registerSingleton("empty", () => "");
+
+    expect(container.get("zero")).toBe(0);
+    expect(container.get("empty")).toBe("");
+  });
+});
+
+describe("tryGet", () => {
+  it("应该在服务存在时返回服务实例", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("test", () => ({ value: 123 }));
+
+    const result = container.tryGet("test");
+    expect(result).toEqual({ value: 123 });
+  });
+
+  it("应该在服务不存在时返回 undefined", () => {
+    const container = new ServiceContainer();
+
+    const result = container.tryGet("nonexistent");
+    expect(result).toBeUndefined();
+  });
+
+  it("应该在工厂函数抛出错误时返回 undefined", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("error", () => {
+      throw new Error("创建失败");
+    });
+
+    const result = container.tryGet("error");
+    expect(result).toBeUndefined();
+  });
+
+  it("应该支持工厂服务的参数传递", () => {
+    const container = new ServiceContainer();
+    container.registerFactory("factory", (id: number) => ({ id }));
+
+    const result = container.tryGet<{ id: number }>("factory", 42);
+    expect(result).toEqual({ id: 42 });
+  });
+});
+
+describe("getOrDefault", () => {
+  it("应该在服务存在时返回服务实例", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("test", () => ({ value: 123 }));
+
+    const result = container.getOrDefault("test", { value: 0 });
+    expect(result).toEqual({ value: 123 });
+  });
+
+  it("应该在服务不存在时返回默认值", () => {
+    const container = new ServiceContainer();
+
+    const result = container.getOrDefault("nonexistent", { value: 999 });
+    expect(result).toEqual({ value: 999 });
+  });
+
+  it("应该在工厂函数抛出错误时返回默认值", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("error", () => {
+      throw new Error("创建失败");
+    });
+
+    const result = container.getOrDefault("error", "default");
+    expect(result).toBe("default");
+  });
+});
+
+describe("getServiceInfo", () => {
+  it("应该返回单例服务的元数据", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("test", () => ({ value: 1 }), ["alias1"]);
+
+    const info = container.getServiceInfo("test");
+    expect(info).toBeTruthy();
+    expect(info!.name).toBe("test");
+    expect(info!.lifetime).toBe("singleton");
+    expect(info!.aliases).toContain("alias1");
+    expect(info!.hasInstance).toBe(false); // 还未获取过
+  });
+
+  it("应该在获取服务后更新 hasInstance", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("test", () => ({ value: 1 }));
+
+    // 获取服务前
+    let info = container.getServiceInfo("test");
+    expect(info!.hasInstance).toBe(false);
+
+    // 获取服务后
+    container.get("test");
+    info = container.getServiceInfo("test");
+    expect(info!.hasInstance).toBe(true);
+  });
+
+  it("应该通过别名获取服务信息", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("test", () => ({ value: 1 }), ["alias1"]);
+
+    const info = container.getServiceInfo("alias1");
+    expect(info).toBeTruthy();
+    expect(info!.name).toBe("test"); // 应该返回主名称
+  });
+
+  it("应该在服务不存在时返回 undefined", () => {
+    const container = new ServiceContainer();
+
+    const info = container.getServiceInfo("nonexistent");
+    expect(info).toBeUndefined();
+  });
+
+  it("应该返回不同生命周期的正确信息", () => {
+    const container = new ServiceContainer();
+    container.registerTransient("transient", () => ({}));
+    container.registerScoped("scoped", () => ({}));
+    container.registerFactory("factory", () => ({}));
+
+    expect(container.getServiceInfo("transient")!.lifetime).toBe("transient");
+    expect(container.getServiceInfo("scoped")!.lifetime).toBe("scoped");
+    expect(container.getServiceInfo("factory")!.lifetime).toBe("factory");
+  });
+});
+
+describe("getAllServiceInfo", () => {
+  it("应该返回所有服务的元数据", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("service1", () => ({}));
+    container.registerTransient("service2", () => ({}));
+
+    const allInfo = container.getAllServiceInfo();
+    expect(allInfo.length).toBe(2);
+    expect(allInfo.map((i) => i.name)).toContain("service1");
+    expect(allInfo.map((i) => i.name)).toContain("service2");
+  });
+
+  it("应该去重（别名和主名指向同一服务）", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("test", () => ({}), ["alias1", "alias2"]);
+
+    const allInfo = container.getAllServiceInfo();
+    expect(allInfo.length).toBe(1); // 只有一个服务
+    expect(allInfo[0].name).toBe("test");
+    expect(allInfo[0].aliases).toContain("alias1");
+    expect(allInfo[0].aliases).toContain("alias2");
+  });
+
+  it("应该在没有服务时返回空数组", () => {
+    const container = new ServiceContainer();
+
+    const allInfo = container.getAllServiceInfo();
+    expect(allInfo).toEqual([]);
+  });
+});
+
+describe("getServicesByLifetime", () => {
+  it("应该返回指定生命周期的所有服务", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("singleton1", () => ({}));
+    container.registerSingleton("singleton2", () => ({}));
+    container.registerTransient("transient1", () => ({}));
+    container.registerScoped("scoped1", () => ({}));
+
+    const singletons = container.getServicesByLifetime("singleton");
+    expect(singletons.length).toBe(2);
+    expect(singletons).toContain("singleton1");
+    expect(singletons).toContain("singleton2");
+
+    const transients = container.getServicesByLifetime("transient");
+    expect(transients.length).toBe(1);
+    expect(transients).toContain("transient1");
+
+    const scoped = container.getServicesByLifetime("scoped");
+    expect(scoped.length).toBe(1);
+    expect(scoped).toContain("scoped1");
+  });
+
+  it("应该在没有匹配服务时返回空数组", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("singleton", () => ({}));
+
+    const factories = container.getServicesByLifetime("factory");
+    expect(factories).toEqual([]);
+  });
+});
+
+describe("remove 通过别名", () => {
+  it("应该支持通过别名移除服务", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("test", () => ({ value: 1 }), [
+      "alias1",
+      "alias2",
+    ]);
+
+    // 通过别名移除
+    const result = container.remove("alias1");
+
+    expect(result).toBe(true);
+    expect(container.has("test")).toBeFalsy();
+    expect(container.has("alias1")).toBeFalsy();
+    expect(container.has("alias2")).toBeFalsy();
+  });
+
+  it("应该在移除不存在的服务时返回 false", () => {
+    const container = new ServiceContainer();
+
+    const result = container.remove("nonexistent");
+    expect(result).toBe(false);
+  });
+
+  it("应该返回移除结果", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("test", () => ({}));
+
+    expect(container.remove("test")).toBe(true);
+    expect(container.remove("test")).toBe(false); // 已移除
+  });
+});
+
+describe("工厂函数错误处理", () => {
+  it("应该包装工厂函数的错误信息", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("error", () => {
+      throw new Error("原始错误信息");
+    });
+
+    let error: Error | null = null;
+    try {
+      container.get("error");
+    } catch (e) {
+      error = e as Error;
+    }
+
+    expect(error).toBeTruthy();
+    expect(error!.message).toContain("error"); // 包含服务名
+    expect(error!.message).toContain("创建失败");
+    expect(error!.message).toContain("原始错误信息");
+  });
+
+  it("应该处理非 Error 类型的抛出", () => {
+    const container = new ServiceContainer();
+    container.registerSingleton("error", () => {
+      throw "字符串错误";
+    });
+
+    let error: Error | null = null;
+    try {
+      container.get("error");
+    } catch (e) {
+      error = e as Error;
+    }
+
+    expect(error).toBeTruthy();
+    expect(error!.message).toContain("字符串错误");
+  });
+
+  it("应该在 transient 服务中也包装错误", () => {
+    const container = new ServiceContainer();
+    container.registerTransient("error", () => {
+      throw new Error("transient 错误");
+    });
+
+    let error: Error | null = null;
+    try {
+      container.get("error");
+    } catch (e) {
+      error = e as Error;
+    }
+
+    expect(error).toBeTruthy();
+    expect(error!.message).toContain("error");
+    expect(error!.message).toContain("transient 错误");
+  });
+
+  it("应该在 scoped 服务中也包装错误", () => {
+    const container = new ServiceContainer();
+    container.registerScoped("error", () => {
+      throw new Error("scoped 错误");
+    });
+
+    const scope = container.createScope();
+    let error: Error | null = null;
+    try {
+      scope.get("error");
+    } catch (e) {
+      error = e as Error;
+    }
+
+    expect(error).toBeTruthy();
+    expect(error!.message).toContain("error");
+    expect(error!.message).toContain("scoped 错误");
+  });
+
+  it("应该在 factory 服务中也包装错误", () => {
+    const container = new ServiceContainer();
+    container.registerFactory("error", () => {
+      throw new Error("factory 错误");
+    });
+
+    let error: Error | null = null;
+    try {
+      container.get("error");
+    } catch (e) {
+      error = e as Error;
+    }
+
+    expect(error).toBeTruthy();
+    expect(error!.message).toContain("error");
+    expect(error!.message).toContain("factory 错误");
+  });
+});
