@@ -375,7 +375,11 @@ export class ServiceContainer {
    * @param args 工厂函数的参数（仅用于 factory 类型）
    * @returns 服务实例或默认值
    */
-  getOrDefault<T = unknown>(name: string, defaultValue: T, ...args: unknown[]): T {
+  getOrDefault<T = unknown>(
+    name: string,
+    defaultValue: T,
+    ...args: unknown[]
+  ): T {
     const result = this.tryGet<T>(name, ...args);
     return result !== undefined ? result : defaultValue;
   }

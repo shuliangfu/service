@@ -1,6 +1,7 @@
 # @dreamer/service
 
-> 一个兼容 Deno 和 Bun 的服务容器（依赖注入）工具库，提供单例、多例、作用域、工厂模式等服务管理功能
+> 一个兼容 Deno 和 Bun
+> 的服务容器（依赖注入）工具库，提供单例、多例、作用域、工厂模式等服务管理功能
 
 [![JSR](https://jsr.io/badges/@dreamer/service)](https://jsr.io/@dreamer/service)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -47,12 +48,13 @@
 
 ## 🎨 设计原则
 
-**所有 @dreamer/* 库都遵循以下原则**：
+__所有 @dreamer/_ 库都遵循以下原则_*：
 
 - **主包（@dreamer/xxx）**：用于服务端（兼容 Deno 和 Bun 运行时）
 - **客户端子包（@dreamer/xxx/client）**：用于客户端（浏览器环境）
 
 这样可以：
+
 - 明确区分服务端和客户端代码
 - 避免在客户端代码中引入服务端依赖
 - 提供更好的类型安全和代码提示
@@ -89,7 +91,8 @@ bunx jsr add @dreamer/service
 
 - **运行时要求**：Deno 2.6+ 或 Bun 1.3.5
 - **服务端**：✅ 支持（兼容 Deno 和 Bun 运行时，服务容器/依赖注入是服务端概念）
-- **客户端**：❌ 不支持（浏览器环境，服务容器/依赖注入是服务端架构模式，客户端不需要）
+- **客户端**：❌
+  不支持（浏览器环境，服务容器/依赖注入是服务端架构模式，客户端不需要）
 - **依赖**：无外部依赖（纯 TypeScript 实现）
 
 ---
@@ -270,7 +273,10 @@ container.registerFactory("database", (config: DatabaseConfig) => {
 });
 
 // 使用工厂创建不同实例
-const pgDb = container.get("database", { type: "postgresql", host: "localhost" });
+const pgDb = container.get("database", {
+  type: "postgresql",
+  host: "localhost",
+});
 const mysqlDb = container.get("database", { type: "mysql", host: "localhost" });
 ```
 
@@ -326,7 +332,7 @@ const client2 = container.get("apiClient", "https://api2.com", 10000);
 #### 构造函数
 
 ```typescript
-new ServiceContainer()
+new ServiceContainer();
 ```
 
 创建一个新的服务容器实例。
@@ -338,11 +344,13 @@ new ServiceContainer()
 注册单例服务。在整个应用生命周期中只有一个实例。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `factory: () => T` - 工厂函数，用于创建服务实例
 - `aliases?: string[]` - 服务别名（可选）
 
 **示例**：
+
 ```typescript
 container.registerSingleton("database", () => new Database());
 ```
@@ -352,11 +360,13 @@ container.registerSingleton("database", () => new Database());
 注册多例服务。每次获取时都会创建新实例。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `factory: () => T` - 工厂函数，用于创建服务实例
 - `aliases?: string[]` - 服务别名（可选）
 
 **示例**：
+
 ```typescript
 container.registerTransient("logger", () => new Logger());
 ```
@@ -366,11 +376,13 @@ container.registerTransient("logger", () => new Logger());
 注册作用域服务。在同一个作用域内是单例，不同作用域之间是独立的。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `factory: () => T` - 工厂函数，用于创建服务实例
 - `aliases?: string[]` - 服务别名（可选）
 
 **示例**：
+
 ```typescript
 container.registerScoped("requestContext", () => new RequestContext());
 ```
@@ -380,11 +392,13 @@ container.registerScoped("requestContext", () => new RequestContext());
 注册工厂服务。允许使用工厂函数动态创建服务，可以传入参数。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `factory: (...args: TArgs) => T` - 工厂函数（可以接受参数）
 - `aliases?: string[]` - 服务别名（可选）
 
 **示例**：
+
 ```typescript
 container.registerFactory("httpClient", (baseURL: string) => {
   return new HttpClient({ baseURL });
@@ -396,12 +410,14 @@ container.registerFactory("httpClient", (baseURL: string) => {
 获取服务实例。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `...args: unknown[]` - 工厂函数的参数（仅用于 factory 类型）
 
 **返回**：服务实例
 
 **示例**：
+
 ```typescript
 const userService = container.get("userService");
 const client = container.get("httpClient", "https://api.example.com");
@@ -412,11 +428,13 @@ const client = container.get("httpClient", "https://api.example.com");
 检查服务是否存在。
 
 **参数**：
+
 - `name: string` - 服务名称
 
 **返回**：是否存在
 
 **示例**：
+
 ```typescript
 if (container.has("userService")) {
   // 服务已注册
@@ -428,11 +446,13 @@ if (container.has("userService")) {
 移除服务。支持通过主名称或别名移除。
 
 **参数**：
+
 - `name: string` - 服务名称或别名
 
 **返回**：是否成功移除
 
 **示例**：
+
 ```typescript
 const success = container.remove("userService");
 console.log(success); // true
@@ -446,12 +466,14 @@ container.remove("userServiceAlias");
 安全获取服务（不抛出错误）。如果服务不存在或创建失败，返回 undefined。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `...args: unknown[]` - 工厂函数的参数（仅用于 factory 类型）
 
 **返回**：服务实例或 undefined
 
 **示例**：
+
 ```typescript
 const service = container.tryGet("userService");
 if (service) {
@@ -467,6 +489,7 @@ const result = container.tryGet("nonexistent"); // undefined
 获取服务，如果不存在则返回默认值。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `defaultValue: T` - 默认值
 - `...args: unknown[]` - 工厂函数的参数（仅用于 factory 类型）
@@ -474,6 +497,7 @@ const result = container.tryGet("nonexistent"); // undefined
 **返回**：服务实例或默认值
 
 **示例**：
+
 ```typescript
 const logger = container.getOrDefault("logger", new ConsoleLogger());
 ```
@@ -483,17 +507,19 @@ const logger = container.getOrDefault("logger", new ConsoleLogger());
 获取服务元数据信息。
 
 **参数**：
+
 - `name: string` - 服务名称
 
 **返回**：服务信息，如果服务不存在返回 undefined
 
 **示例**：
+
 ```typescript
 const info = container.getServiceInfo("userService");
 if (info) {
-  console.log(info.name);       // "userService"
-  console.log(info.lifetime);   // "singleton"
-  console.log(info.aliases);    // ["userSvc"]
+  console.log(info.name); // "userService"
+  console.log(info.lifetime); // "singleton"
+  console.log(info.aliases); // ["userSvc"]
   console.log(info.hasInstance); // true（如果已创建实例）
 }
 ```
@@ -505,9 +531,10 @@ if (info) {
 **返回**：服务信息数组
 
 **示例**：
+
 ```typescript
 const allInfo = container.getAllServiceInfo();
-allInfo.forEach(info => {
+allInfo.forEach((info) => {
   console.log(`${info.name} (${info.lifetime})`);
 });
 ```
@@ -517,11 +544,13 @@ allInfo.forEach(info => {
 获取指定生命周期类型的所有服务名称。
 
 **参数**：
+
 - `lifetime: ServiceLifetime` - 服务生命周期类型
 
 **返回**：服务名称数组
 
 **示例**：
+
 ```typescript
 const singletons = container.getServicesByLifetime("singleton");
 console.log(singletons); // ["database", "config", ...]
@@ -534,6 +563,7 @@ console.log(singletons); // ["database", "config", ...]
 **返回**：作用域实例
 
 **示例**：
+
 ```typescript
 const scope = container.createScope();
 const ctx = scope.get("requestContext");
@@ -545,6 +575,7 @@ scope.dispose(); // 清理作用域内的服务
 清空所有服务。
 
 **示例**：
+
 ```typescript
 container.clear();
 ```
@@ -556,6 +587,7 @@ container.clear();
 **返回**：服务名称数组
 
 **示例**：
+
 ```typescript
 const services = container.getRegisteredServices();
 console.log(services); // ["userService", "logger", ...]
@@ -566,12 +598,14 @@ console.log(services); // ["userService", "logger", ...]
 替换服务（先移除再注册）。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `lifetime: ServiceLifetime` - 服务生命周期
 - `factory: (...args: unknown[]) => T` - 工厂函数
 - `aliases?: string[]` - 服务别名
 
 **示例**：
+
 ```typescript
 container.replace("userService", "singleton", () => new NewUserService());
 ```
@@ -587,6 +621,7 @@ container.replace("userService", "singleton", () => new NewUserService());
 在作用域内获取服务。
 
 **参数**：
+
 - `name: string` - 服务名称
 - `...args: unknown[]` - 工厂函数的参数
 
@@ -597,6 +632,7 @@ container.replace("userService", "singleton", () => new NewUserService());
 检查服务是否存在。
 
 **参数**：
+
 - `name: string` - 服务名称
 
 **返回**：是否存在
@@ -653,18 +689,19 @@ interface IServiceScope {
 **返回**：服务容器实例
 
 **示例**：
+
 ```typescript
 const container = createServiceContainer();
 ```
 
 ## 📊 测试报告
 
-| 项目 | 数值 |
-|------|------|
-| 总测试数 | 56 |
-| 通过 | 56 |
-| 失败 | 0 |
-| 通过率 | 100% |
+| 项目     | 数值       |
+| -------- | ---------- |
+| 总测试数 | 56         |
+| 通过     | 56         |
+| 失败     | 0          |
+| 通过率   | 100%       |
 | 测试时间 | 2026-01-30 |
 
 详细测试报告请查看 [TEST_REPORT.md](./TEST_REPORT.md)
