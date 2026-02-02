@@ -33,10 +33,13 @@
   },
   "nodeModulesDir": "auto",
   "imports": {
-    "@dreamer/test": "jsr:@dreamer/test@^1.0.0-beta.39"
+    "@dreamer/test": "jsr:@dreamer/test@^1.0.0-beta.40"
   },
   "allowScripts": {
     "allow": [],
-    "deny": ["npm:esbuild@0.27.2", "npm:puppeteer@24.36.0"]
+    "deny": [
+      "npm:esbuild@0.27.2",
+      "npm:puppeteer@24.36.0"
+    ]
   }
 }
