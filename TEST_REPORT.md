@@ -1,284 +1,284 @@
-# @dreamer/service 测试报告
+# @dreamer/service Test Report
 
-## 📋 测试概览
+## 📋 Test Overview
 
-| 项目       | 信息          |
-| ---------- | ------------- |
-| 测试库版本 | 1.0.0-beta.4  |
-| 测试框架   | @dreamer/test |
-| 测试时间   | 2026-01-30    |
-| 测试环境   | Deno 2.x      |
+| Item | Value |
+|------|-------|
+| Test Library Version | 1.0.0-beta.4 |
+| Test Framework | @dreamer/test |
+| Test Date | 2026-01-30 |
+| Test Environment | Deno 2.x |
 
-## ✅ 测试结果
+## ✅ Test Results
 
-### 总体统计
+### Overall Statistics
 
-| 指标     | 数值   |
-| -------- | ------ |
-| 总测试数 | 56     |
-| 通过     | 56     |
-| 失败     | 0      |
-| 通过率   | 100%   |
-| 执行时间 | ~400ms |
+| Metric | Value |
+|--------|-------|
+| Total Tests | 56 |
+| Passed | 56 |
+| Failed | 0 |
+| Pass Rate | 100% |
+| Execution Time | ~400ms |
 
-### 测试文件统计
+### Test File Statistics
 
-| 测试文件    | 测试数量 | 状态        |
-| ----------- | -------- | ----------- |
-| mod.test.ts | 56       | ✅ 全部通过 |
+| Test File | Tests | Status |
+|-----------|-------|--------|
+| mod.test.ts | 56 | ✅ All passed |
 
-## 🧪 功能测试详情
+## 🧪 Functional Test Details
 
-### 1. ServiceContainer 基础功能 - 28 个测试
+### 1. ServiceContainer Basic - 28 tests
 
-#### registerSingleton (2 个测试)
+#### registerSingleton (2 tests)
 
-| 测试场景            | 状态 |
-| ------------------- | ---- |
-| ✅ 应该注册单例服务 | 通过 |
-| ✅ 应该支持服务别名 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Register singleton service | Passed |
+| ✅ Support service alias | Passed |
 
-#### registerTransient (1 个测试)
+#### registerTransient (1 test)
 
-| 测试场景            | 状态 |
-| ------------------- | ---- |
-| ✅ 应该注册多例服务 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Register transient service | Passed |
 
-#### registerScoped (2 个测试)
+#### registerScoped (2 tests)
 
-| 测试场景                  | 状态 |
-| ------------------------- | ---- |
-| ✅ 应该在作用域内是单例   | 通过 |
-| ✅ 应该在不同作用域间独立 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Singleton within scope | Passed |
+| ✅ Independent across scopes | Passed |
 
-#### registerFactory (1 个测试)
+#### registerFactory (1 test)
 
-| 测试场景            | 状态 |
-| ------------------- | ---- |
-| ✅ 应该注册工厂服务 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Register factory service | Passed |
 
-#### get (2 个测试)
+#### get (2 tests)
 
-| 测试场景                      | 状态 |
-| ----------------------------- | ---- |
-| ✅ 应该获取已注册的服务       | 通过 |
-| ✅ 应该在服务未注册时抛出错误 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Get registered service | Passed |
+| ✅ Throw when service not registered | Passed |
 
-#### has (1 个测试)
+#### has (1 test)
 
-| 测试场景                | 状态 |
-| ----------------------- | ---- |
-| ✅ 应该检查服务是否存在 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Check if service exists | Passed |
 
-#### remove (4 个测试)
+#### remove (4 tests)
 
-| 测试场景                  | 状态 |
-| ------------------------- | ---- |
-| ✅ 应该移除服务           | 通过 |
-| ✅ 应该清理单例实例       | 通过 |
-| ✅ 应该清理别名           | 通过 |
-| ✅ 应该清理作用域中的实例 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Remove service | Passed |
+| ✅ Clear singleton instance | Passed |
+| ✅ Clear alias | Passed |
+| ✅ Clear scoped instance | Passed |
 
-#### createScope (2 个测试)
+#### createScope (2 tests)
 
-| 测试场景              | 状态 |
-| --------------------- | ---- |
-| ✅ 应该创建作用域     | 通过 |
-| ✅ 应该支持嵌套作用域 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Create scope | Passed |
+| ✅ Support nested scopes | Passed |
 
-#### clear (1 个测试)
+#### clear (1 test)
 
-| 测试场景            | 状态 |
-| ------------------- | ---- |
-| ✅ 应该清空所有服务 | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Clear all services | Passed |
 
-#### getRegisteredServices (3 个测试)
+#### getRegisteredServices (3 tests)
 
-| 测试场景                        | 状态 |
-| ------------------------------- | ---- |
-| ✅ 应该返回所有已注册的服务名称 | 通过 |
-| ✅ 应该包含别名                 | 通过 |
-| ✅ 应该在没有服务时返回空数组   | 通过 |
+| Scenario | Status |
+|----------|--------|
+| ✅ Return all registered service names | Passed |
+| ✅ Include aliases | Passed |
+| ✅ Return empty array when no services | Passed |
 
-#### replace (3 个测试)
+#### replace (3 tests)
 
-| 测试场景                      | 状态 |
-| ----------------------------- | ---- |
-| ✅ 应该替换已存在的服务       | 通过 |
-| ✅ 应该替换不同生命周期的服务 | 通过 |
-| ✅ 应该替换带别名的服务       | 通过 |
-
-#### 错误处理 (3 个测试)
-
-| 测试场景                                  | 状态 |
-| ----------------------------------------- | ---- |
-| ✅ 应该防止重复注册服务                   | 通过 |
-| ✅ 应该防止别名冲突                       | 通过 |
-| ✅ 应该在作用域外使用作用域服务时抛出错误 | 通过 |
-
-#### IServiceScope (2 个测试)
-
-| 测试场景                           | 状态 |
-| ---------------------------------- | ---- |
-| ✅ 应该支持 dispose 方法清理作用域 | 通过 |
-| ✅ 应该支持作用域的 has 方法       | 通过 |
-
-### 2. createServiceContainer 工厂函数 - 1 个测试
-
-| 测试场景                | 状态 |
-| ----------------------- | ---- |
-| ✅ 应该创建服务容器实例 | 通过 |
-
-### 3. 单例 undefined/null 支持 - 3 个测试
-
-| 测试场景                             | 状态 |
-| ------------------------------------ | ---- |
-| ✅ 应该支持工厂函数返回 undefined    | 通过 |
-| ✅ 应该支持工厂函数返回 null         | 通过 |
-| ✅ 应该支持工厂函数返回 0 或空字符串 | 通过 |
-
-### 4. tryGet 方法 - 4 个测试
-
-| 测试场景                                  | 状态 |
-| ----------------------------------------- | ---- |
-| ✅ 应该在服务存在时返回服务实例           | 通过 |
-| ✅ 应该在服务不存在时返回 undefined       | 通过 |
-| ✅ 应该在工厂函数抛出错误时返回 undefined | 通过 |
-| ✅ 应该支持工厂服务的参数传递             | 通过 |
-
-### 5. getOrDefault 方法 - 3 个测试
-
-| 测试场景                              | 状态 |
-| ------------------------------------- | ---- |
-| ✅ 应该在服务存在时返回服务实例       | 通过 |
-| ✅ 应该在服务不存在时返回默认值       | 通过 |
-| ✅ 应该在工厂函数抛出错误时返回默认值 | 通过 |
-
-### 6. getServiceInfo 方法 - 5 个测试
-
-| 测试场景                            | 状态 |
-| ----------------------------------- | ---- |
-| ✅ 应该返回单例服务的元数据         | 通过 |
-| ✅ 应该在获取服务后更新 hasInstance | 通过 |
-| ✅ 应该通过别名获取服务信息         | 通过 |
-| ✅ 应该在服务不存在时返回 undefined | 通过 |
-| ✅ 应该返回不同生命周期的正确信息   | 通过 |
-
-### 7. getAllServiceInfo 方法 - 3 个测试
-
-| 测试场景                              | 状态 |
-| ------------------------------------- | ---- |
-| ✅ 应该返回所有服务的元数据           | 通过 |
-| ✅ 应该去重（别名和主名指向同一服务） | 通过 |
-| ✅ 应该在没有服务时返回空数组         | 通过 |
-
-### 8. getServicesByLifetime 方法 - 2 个测试
-
-| 测试场景                          | 状态 |
-| --------------------------------- | ---- |
-| ✅ 应该返回指定生命周期的所有服务 | 通过 |
-| ✅ 应该在没有匹配服务时返回空数组 | 通过 |
-
-### 9. remove 通过别名 - 3 个测试
-
-| 测试场景                              | 状态 |
-| ------------------------------------- | ---- |
-| ✅ 应该支持通过别名移除服务           | 通过 |
-| ✅ 应该在移除不存在的服务时返回 false | 通过 |
-| ✅ 应该返回移除结果                   | 通过 |
-
-### 10. 工厂函数错误处理 - 5 个测试
-
-| 测试场景                             | 状态 |
-| ------------------------------------ | ---- |
-| ✅ 应该包装工厂函数的错误信息        | 通过 |
-| ✅ 应该处理非 Error 类型的抛出       | 通过 |
-| ✅ 应该在 transient 服务中也包装错误 | 通过 |
-| ✅ 应该在 scoped 服务中也包装错误    | 通过 |
-| ✅ 应该在 factory 服务中也包装错误   | 通过 |
-
-## 📊 测试覆盖分析
-
-### 接口方法覆盖
-
-| 方法                    | 覆盖状态  | 测试数量 |
-| ----------------------- | --------- | -------- |
-| `registerSingleton`     | ✅ 已覆盖 | 2        |
-| `registerTransient`     | ✅ 已覆盖 | 1        |
-| `registerScoped`        | ✅ 已覆盖 | 2        |
-| `registerFactory`       | ✅ 已覆盖 | 1        |
-| `get`                   | ✅ 已覆盖 | 2        |
-| `tryGet`                | ✅ 已覆盖 | 4        |
-| `getOrDefault`          | ✅ 已覆盖 | 3        |
-| `has`                   | ✅ 已覆盖 | 1        |
-| `remove`                | ✅ 已覆盖 | 7        |
-| `clear`                 | ✅ 已覆盖 | 1        |
-| `replace`               | ✅ 已覆盖 | 3        |
-| `createScope`           | ✅ 已覆盖 | 2        |
-| `getRegisteredServices` | ✅ 已覆盖 | 3        |
-| `getServiceInfo`        | ✅ 已覆盖 | 5        |
-| `getAllServiceInfo`     | ✅ 已覆盖 | 3        |
-| `getServicesByLifetime` | ✅ 已覆盖 | 2        |
-
-### 边界情况覆盖
-
-| 边界情况                     | 覆盖状态 |
-| ---------------------------- | -------- |
-| ✅ 服务未注册时抛出错误      | 已覆盖   |
-| ✅ 重复注册服务抛出错误      | 已覆盖   |
-| ✅ 别名冲突抛出错误          | 已覆盖   |
-| ✅ 作用域外使用 scoped 服务  | 已覆盖   |
-| ✅ 工厂函数返回 undefined    | 已覆盖   |
-| ✅ 工厂函数返回 null         | 已覆盖   |
-| ✅ 工厂函数返回 0 或空字符串 | 已覆盖   |
-| ✅ 没有服务时返回空数组      | 已覆盖   |
-| ✅ 移除不存在的服务          | 已覆盖   |
-
-### 错误处理覆盖
-
-| 错误场景                     | 覆盖状态 |
-| ---------------------------- | -------- |
-| ✅ 服务未注册错误            | 已覆盖   |
-| ✅ 重复注册错误              | 已覆盖   |
-| ✅ 别名冲突错误              | 已覆盖   |
-| ✅ 作用域服务错误            | 已覆盖   |
-| ✅ 工厂函数 Error 类型错误   | 已覆盖   |
-| ✅ 工厂函数非 Error 类型错误 | 已覆盖   |
-| ✅ 各生命周期工厂函数错误    | 已覆盖   |
-
-## 🎯 新功能覆盖
-
-### v1.0.0-beta.4 新增功能
-
-| 功能                      | 描述                                                    | 测试覆盖    |
-| ------------------------- | ------------------------------------------------------- | ----------- |
-| NOT_CREATED Symbol        | 使用 Symbol 标记未创建状态，支持工厂返回 undefined/null | ✅ 3 个测试 |
-| `tryGet()`                | 安全获取服务，不抛出错误                                | ✅ 4 个测试 |
-| `getOrDefault()`          | 带默认值的服务获取                                      | ✅ 3 个测试 |
-| `getServiceInfo()`        | 获取服务元数据                                          | ✅ 5 个测试 |
-| `getAllServiceInfo()`     | 获取所有服务元数据                                      | ✅ 3 个测试 |
-| `getServicesByLifetime()` | 按生命周期筛选服务                                      | ✅ 2 个测试 |
-| 别名移除改进              | 支持通过别名移除服务，返回布尔值                        | ✅ 3 个测试 |
-| 错误包装                  | 工厂函数错误包装，提供更好的调试信息                    | ✅ 5 个测试 |
-
-## ✨ 优点
-
-1. **完整的生命周期支持**：singleton、transient、scoped、factory 四种生命周期
-2. **强大的别名系统**：支持服务别名，便于依赖注入
-3. **安全的服务获取**：tryGet 和 getOrDefault 方法避免异常
-4. **丰富的元数据**：getServiceInfo 提供服务运行时信息
-5. **改进的错误处理**：工厂函数错误包装，便于调试
-6. **边界情况处理**：支持工厂函数返回 undefined/null/0/空字符串
-
-## 📝 结论
-
-@dreamer/service 库测试全面覆盖了所有公共 API 和新增功能：
-
-- ✅ 56 个测试全部通过
-- ✅ 100% 通过率
-- ✅ 覆盖所有生命周期类型
-- ✅ 覆盖所有公共方法
-- ✅ 覆盖边界情况和错误处理
-- ✅ 覆盖 v1.0.0-beta.4 所有新功能
-
-测试结果表明该库功能完整、稳定可靠，适合在生产环境中使用。
+| Scenario | Status |
+|----------|--------|
+| ✅ Replace existing service | Passed |
+| ✅ Replace different lifetime services | Passed |
+| ✅ Replace aliased service | Passed |
+
+#### Error Handling (3 tests)
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Prevent duplicate registration | Passed |
+| ✅ Prevent alias conflict | Passed |
+| ✅ Throw when using scoped service outside scope | Passed |
+
+#### IServiceScope (2 tests)
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Support dispose for scope cleanup | Passed |
+| ✅ Support scope has method | Passed |
+
+### 2. createServiceContainer Factory - 1 test
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Create service container instance | Passed |
+
+### 3. Singleton undefined/null Support - 3 tests
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Support factory returning undefined | Passed |
+| ✅ Support factory returning null | Passed |
+| ✅ Support factory returning 0 or empty string | Passed |
+
+### 4. tryGet Method - 4 tests
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Return service when exists | Passed |
+| ✅ Return undefined when not exists | Passed |
+| ✅ Return undefined when factory throws | Passed |
+| ✅ Support factory service parameters | Passed |
+
+### 5. getOrDefault Method - 3 tests
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Return service when exists | Passed |
+| ✅ Return default when not exists | Passed |
+| ✅ Return default when factory throws | Passed |
+
+### 6. getServiceInfo Method - 5 tests
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Return singleton service metadata | Passed |
+| ✅ Update hasInstance after get | Passed |
+| ✅ Get service info via alias | Passed |
+| ✅ Return undefined when not exists | Passed |
+| ✅ Return correct info for different lifetimes | Passed |
+
+### 7. getAllServiceInfo Method - 3 tests
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Return all service metadata | Passed |
+| ✅ Deduplicate (alias and main name) | Passed |
+| ✅ Return empty array when no services | Passed |
+
+### 8. getServicesByLifetime Method - 2 tests
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Return services by lifetime | Passed |
+| ✅ Return empty array when no match | Passed |
+
+### 9. remove by Alias - 3 tests
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Remove service via alias | Passed |
+| ✅ Return false when removing non-existent | Passed |
+| ✅ Return remove result | Passed |
+
+### 10. Factory Error Handling - 5 tests
+
+| Scenario | Status |
+|----------|--------|
+| ✅ Wrap factory error message | Passed |
+| ✅ Handle non-Error throws | Passed |
+| ✅ Wrap error in transient service | Passed |
+| ✅ Wrap error in scoped service | Passed |
+| ✅ Wrap error in factory service | Passed |
+
+## 📊 Coverage Analysis
+
+### API Method Coverage
+
+| Method | Status | Tests |
+|--------|--------|-------|
+| `registerSingleton` | ✅ Covered | 2 |
+| `registerTransient` | ✅ Covered | 1 |
+| `registerScoped` | ✅ Covered | 2 |
+| `registerFactory` | ✅ Covered | 1 |
+| `get` | ✅ Covered | 2 |
+| `tryGet` | ✅ Covered | 4 |
+| `getOrDefault` | ✅ Covered | 3 |
+| `has` | ✅ Covered | 1 |
+| `remove` | ✅ Covered | 7 |
+| `clear` | ✅ Covered | 1 |
+| `replace` | ✅ Covered | 3 |
+| `createScope` | ✅ Covered | 2 |
+| `getRegisteredServices` | ✅ Covered | 3 |
+| `getServiceInfo` | ✅ Covered | 5 |
+| `getAllServiceInfo` | ✅ Covered | 3 |
+| `getServicesByLifetime` | ✅ Covered | 2 |
+
+### Edge Case Coverage
+
+| Edge Case | Status |
+|-----------|--------|
+| ✅ Throw when service not registered | Covered |
+| ✅ Throw on duplicate registration | Covered |
+| ✅ Throw on alias conflict | Covered |
+| ✅ Throw when using scoped service outside scope | Covered |
+| ✅ Factory returning undefined | Covered |
+| ✅ Factory returning null | Covered |
+| ✅ Factory returning 0 or empty string | Covered |
+| ✅ Return empty array when no services | Covered |
+| ✅ Remove non-existent service | Covered |
+
+### Error Handling Coverage
+
+| Error Scenario | Status |
+|----------------|--------|
+| ✅ Service not registered | Covered |
+| ✅ Duplicate registration | Covered |
+| ✅ Alias conflict | Covered |
+| ✅ Scoped service error | Covered |
+| ✅ Factory Error type | Covered |
+| ✅ Factory non-Error type | Covered |
+| ✅ Factory errors for all lifetimes | Covered |
+
+## 🎯 New Feature Coverage
+
+### v1.0.0-beta.4 Additions
+
+| Feature | Description | Coverage |
+|---------|-------------|----------|
+| NOT_CREATED Symbol | Symbol for uncreated state, supports factory returning undefined/null | ✅ 3 tests |
+| `tryGet()` | Safe service get, no throw | ✅ 4 tests |
+| `getOrDefault()` | Get with default value | ✅ 3 tests |
+| `getServiceInfo()` | Get service metadata | ✅ 5 tests |
+| `getAllServiceInfo()` | Get all service metadata | ✅ 3 tests |
+| `getServicesByLifetime()` | Filter services by lifetime | ✅ 2 tests |
+| Alias remove improvement | Remove via alias, return boolean | ✅ 3 tests |
+| Error wrapping | Wrap factory errors for better debugging | ✅ 5 tests |
+
+## ✨ Strengths
+
+1. **Full lifetime support**: singleton, transient, scoped, factory
+2. **Alias system**: Service aliases for dependency injection
+3. **Safe retrieval**: tryGet and getOrDefault avoid exceptions
+4. **Rich metadata**: getServiceInfo for runtime service info
+5. **Error handling**: Factory error wrapping for debugging
+6. **Edge cases**: Factory can return undefined/null/0/empty string
+
+## 📝 Conclusion
+
+@dreamer/service has comprehensive test coverage for all public APIs and new features:
+
+- ✅ All 56 tests passed
+- ✅ 100% pass rate
+- ✅ All lifetime types covered
+- ✅ All public methods covered
+- ✅ Edge cases and error handling covered
+- ✅ All v1.0.0-beta.4 features covered
+
+The library is feature-complete, stable, and suitable for production use.

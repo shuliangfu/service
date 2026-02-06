@@ -1,6 +1,6 @@
 {
   "name": "@dreamer/service",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0",
   "license": "MIT",
   "exports": {
     ".": "./src/mod.ts"
@@ -33,7 +33,7 @@
   },
   "nodeModulesDir": "auto",
   "imports": {
-    "@dreamer/test": "jsr:@dreamer/test@^1.0.0-beta.40"
+    "@dreamer/test": "jsr:@dreamer/test@^1.0.0"
   },
   "allowScripts": {
     "allow": [],
