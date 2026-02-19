@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "serviceAlreadyRegistered": "服务 \"{name}\" 已注册，请先 remove() 再替换。",
+    "aliasAlreadyInUse": "别名 \"{alias}\" 已被占用。",
+    "serviceNotRegistered": "服务 \"{name}\" 未注册。",
+    "unsupportedLifetime": "不支持的服务生命周期: {lifetime}",
+    "serviceCreateFailed": "服务 \"{name}\" 创建失败: {message}",
+    "scopedMustBeInScope": "作用域服务 \"{name}\" 必须在作用域内使用，请先调用 createScope() 创建作用域。"
+  }
+}

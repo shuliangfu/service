@@ -33,6 +33,8 @@
  * ```
  */
 
+import { $tr } from "./i18n.ts";
+
 /**
  * 服务生命周期类型
  */
@@ -183,7 +185,7 @@ export class ServiceContainer {
   ): void {
     // 检查服务是否已注册
     if (this.services.has(name)) {
-      throw new Error(`服务 "${name}" 已注册，如需替换请先使用 remove() 移除`);
+      throw new Error($tr("errors.serviceAlreadyRegistered", { name }));
     }
 
     // 创建服务注册信息
@@ -202,7 +204,7 @@ export class ServiceContainer {
     if (aliases && aliases.length > 0) {
       for (const alias of aliases) {
         if (this.services.has(alias)) {
-          throw new Error(`别名 "${alias}" 已被使用`);
+          throw new Error($tr("errors.aliasAlreadyInUse", { alias }));
         }
         // 别名指向同一个注册信息
         this.services.set(alias, registration);
@@ -220,7 +222,7 @@ export class ServiceContainer {
   get<T = unknown>(name: string, ...args: unknown[]): T {
     // 检查服务是否存在
     if (!this.has(name)) {
-      throw new Error(`服务 "${name}" 未注册`);
+      throw new Error($tr("errors.serviceNotRegistered", { name }));
     }
 
     const registration = this.services.get(name)! as ServiceRegistration<T>;
@@ -236,7 +238,11 @@ export class ServiceContainer {
       case "factory":
         return this.getFactory<T>(registration, ...args);
       default:
-        throw new Error(`不支持的服务生命周期: ${registration.lifetime}`);
+        throw new Error(
+          $tr("errors.unsupportedLifetime", {
+            lifetime: registration.lifetime,
+          }),
+        );
     }
   }
 
@@ -254,7 +260,10 @@ export class ServiceContainer {
       // 包装错误，添加服务名称信息
       const message = error instanceof Error ? error.message : String(error);
       const wrappedError = new Error(
-        `服务 "${registration.name}" 创建失败: ${message}`,
+        $tr("errors.serviceCreateFailed", {
+          name: registration.name,
+          message,
+        }),
       );
       if (error instanceof Error && error.stack) {
         wrappedError.stack = error.stack;
@@ -295,7 +304,7 @@ export class ServiceContainer {
     const currentScope = this.getCurrentScope();
     if (!currentScope) {
       throw new Error(
-        `作用域服务 "${registration.name}" 必须在作用域内使用，请先调用 createScope() 创建作用域`,
+        $tr("errors.scopedMustBeInScope", { name: registration.name }),
       );
     }
 
@@ -574,3 +583,5 @@ export class ServiceContainer {
 export function createServiceContainer(): ServiceContainer {
   return new ServiceContainer();
 }
+
+// i18n 仅包内使用，不对外导出；测试需 init/setLocale 时从 ./i18n.ts 导入

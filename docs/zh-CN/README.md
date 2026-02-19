@@ -1,17 +1,17 @@
 # @dreamer/service
 
 > 一个兼容 Deno 和 Bun
-> 的服务容器（依赖注入）工具库，提供单例、多例、作用域、工厂模式等服务管理功能
+> 的服务容器（依赖注入）工具包，提供单例、多例、作用域、工厂模式等服务管理功能
 
-[English](./README.md) | 中文 (Chinese)
+> [English](../../README.md) | 中文 (Chinese)
 
 [![JSR](https://jsr.io/badges/@dreamer/service)](https://jsr.io/@dreamer/service)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](../../LICENSE)
 [![Tests: 56 passed](https://img.shields.io/badge/Tests-56%20passed-brightgreen)](./TEST_REPORT.md)
 
 ## 🎯 功能
 
-服务容器（依赖注入）工具库，用于管理应用中的服务和依赖关系。
+服务容器（依赖注入）工具包，用于管理应用中的服务和依赖关系。
 
 ---
 
@@ -50,7 +50,7 @@
 
 ## 🎨 设计原则
 
-__所有 @dreamer/_ 库都遵循以下原则_*：
+__所有 @dreamer/_ 包都遵循以下原则_*：
 
 - **主包（@dreamer/xxx）**：用于服务端（兼容 Deno 和 Bun 运行时）
 - **客户端子包（@dreamer/xxx/client）**：用于客户端（浏览器环境）
@@ -75,9 +75,9 @@ __所有 @dreamer/_ 库都遵循以下原则_*：
 
 ## 📖 服务类型使用指南
 
-### @dreamer 库推荐服务类型
+### @dreamer 包推荐服务类型
 
-| 库                   | 推荐类型      | Manager 类       | 说明                                 |
+| 包                   | 推荐类型      | Manager 类       | 说明                                 |
 | -------------------- | ------------- | ---------------- | ------------------------------------ |
 | `@dreamer/config`    | **Singleton** | ConfigManager    | 配置全局共享，整个应用使用同一份配置 |
 | `@dreamer/session`   | **Singleton** | SessionManager   | 会话管理器全局共享，管理所有用户会话 |
@@ -349,7 +349,10 @@ const pgDb = container.get("database", {
   adapter: "postgresql",
   host: "localhost",
 });
-const mysqlDb = container.get("database", { adapter: "mysql", host: "localhost" });
+const mysqlDb = container.get("database", {
+  adapter: "mysql",
+  host: "localhost",
+});
 ```
 
 #### 工厂模式结合依赖注入
@@ -786,7 +789,7 @@ const container = createServiceContainer();
 - **统一接口**：提供统一的依赖注入 API 接口，降低学习成本
 - **类型安全**：完整的 TypeScript 类型支持
 - **无外部依赖**：纯 TypeScript 实现
-- **基础架构工具**：其他库可能会依赖它来实现依赖注入和服务管理
+- **基础架构工具**：其他包可能会依赖它来实现依赖注入和服务管理
 
 ---
 
@@ -798,7 +801,7 @@ const container = createServiceContainer();
 
 ## 📄 许可证
 
-MIT License - 详见 [LICENSE.md](./LICENSE.md)
+Apache License 2.0 - 详见 [LICENSE](./LICENSE)
 
 ---
 

@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "serviceAlreadyRegistered": "Service \"{name}\" is already registered. Use remove() first to replace.",
+    "aliasAlreadyInUse": "Alias \"{alias}\" is already in use.",
+    "serviceNotRegistered": "Service \"{name}\" is not registered.",
+    "unsupportedLifetime": "Unsupported service lifetime: {lifetime}",
+    "serviceCreateFailed": "Service \"{name}\" creation failed: {message}",
+    "scopedMustBeInScope": "Scoped service \"{name}\" must be used within a scope. Call createScope() first to create a scope."
+  }
+}

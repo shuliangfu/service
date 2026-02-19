@@ -1,9 +1,15 @@
 /**
  * @fileoverview ServiceContainer 测试
+ *
+ * 测试前初始化 i18n 并设置为 zh-CN，以便错误信息为中文。
  */
 
 import { describe, expect, it } from "@dreamer/test";
+import { initServiceI18n, setServiceLocale } from "../src/i18n.ts";
 import { createServiceContainer, ServiceContainer } from "../src/mod.ts";
+
+initServiceI18n();
+setServiceLocale("zh-CN");
 
 describe("ServiceContainer", () => {
   describe("registerSingleton", () => {
@@ -304,7 +310,7 @@ describe("ServiceContainer", () => {
       }
 
       expect(error).toBeTruthy();
-      expect(error?.message).toContain("已被使用");
+      expect(error?.message).toContain("已被占用");
     });
 
     it("应该在作用域外使用作用域服务时抛出错误", () => {
@@ -319,7 +325,7 @@ describe("ServiceContainer", () => {
       }
 
       expect(error).toBeTruthy();
-      expect(error?.message).toContain("必须在作用域内使用");
+      expect(error?.message).toContain("必须在作用域内");
     });
   });
 
