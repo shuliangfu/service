@@ -793,6 +793,13 @@ const container = createServiceContainer();
 
 ---
 
+## 📋 变更日志
+
+**v1.0.2** (2026-02-19) — 变更：i18n 在模块加载时自动初始化，入口不再调用
+init。完整历史详见 [CHANGELOG.md](./CHANGELOG.md)。
+
+---
+
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request！

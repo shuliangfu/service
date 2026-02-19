@@ -46,7 +46,8 @@ export function detectLocale(): Locale {
   return DEFAULT_LOCALE;
 }
 
-export function initServiceI18n(): void {
+/** 内部初始化，导入 i18n 时自动执行，不导出 */
+function initServiceI18n(): void {
   if (serviceI18n) return;
   const i18n = createI18n({
     defaultLocale: DEFAULT_LOCALE,
@@ -57,6 +58,8 @@ export function initServiceI18n(): void {
   i18n.setLocale(detectLocale());
   serviceI18n = i18n;
 }
+
+initServiceI18n();
 
 /** Set locale for service error messages. Initializes i18n if not yet called. */
 export function setServiceLocale(locale: Locale): void {
@@ -69,6 +72,7 @@ export function $tr(
   params?: Record<string, string | number>,
   lang?: Locale,
 ): string {
+  if (!serviceI18n) initServiceI18n();
   if (!serviceI18n) return key;
   if (lang !== undefined) {
     const prev = serviceI18n.getLocale();

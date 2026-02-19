@@ -5,10 +5,9 @@
  */
 
 import { describe, expect, it } from "@dreamer/test";
-import { initServiceI18n, setServiceLocale } from "../src/i18n.ts";
+import { setServiceLocale } from "../src/i18n.ts";
 import { createServiceContainer, ServiceContainer } from "../src/mod.ts";
 
-initServiceI18n();
 setServiceLocale("zh-CN");
 
 describe("ServiceContainer", () => {

@@ -13,10 +13,10 @@
 **Changelog**: [English](./docs/en-US/CHANGELOG.md) |
 [中文 (Chinese)](./docs/zh-CN/CHANGELOG.md)
 
-### [1.0.1] - 2026-02-19
+### [1.0.2] - 2026-02-19
 
-- **Changed**: i18n translation method `$t` → `$tr`; docs reorganized to
-  `docs/en-US/` and `docs/zh-CN/`; license explicitly Apache-2.0.
+- **Changed**: i18n init runs automatically in module; entry no longer calls
+  init. See [CHANGELOG](./docs/en-US/CHANGELOG.md).
 
 ---
 
