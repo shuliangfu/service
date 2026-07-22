@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.1.0] - 2026-07-22
+
+### Added
+
+- **Node.js compatibility**: Service container now runs on Node 22+ — the
+  package is pure logic with no runtime-specific APIs; `getEnv` (used for locale
+  detection in `src/i18n.ts`) is provided by `@dreamer/runtime-adapter` v1.2.2
+  which supports Node.
+- **Node.js test infra**: Added `package.json`, `tsconfig.json`, `.npmrc`, and a
+  3-platform Node CI job (Linux/macOS/Windows, Node 22) driven by
+  `tsx --test --test-force-exit tests/*.test.ts`; the same `tests/*.test.ts`
+  suite is shared across Deno/Bun/Node.
+
+### Changed
+
+- **Dependencies**: `@dreamer/i18n` ^1.1.2, `@dreamer/runtime-adapter` ^1.2.2,
+  `@dreamer/test` ^1.2.3.
+- **CI**: Deno bumped to v2.9.
+- **Publish**: `jsr publish` no longer uses `--no-check` (stricter release
+  gate).
+
+---
+
 ## [1.0.2] - 2026-02-19
 
 ### Changed

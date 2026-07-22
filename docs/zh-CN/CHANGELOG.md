@@ -8,6 +8,27 @@
 
 ---
 
+## [1.1.0] - 2026-07-22
+
+### 新增
+
+- **Node.js 兼容**：服务容器现可在 Node 22+ 运行——本包为纯逻辑，无运行时专属
+  API；`src/i18n.ts` 中用于语言检测的 `getEnv` 由 `@dreamer/runtime-adapter`
+  v1.2.2 提供（已支持 Node）。
+- **Node.js 测试基建**：新增 `package.json`、`tsconfig.json`、`.npmrc`，以及
+  三平台 Node CI 任务（Linux/macOS/Windows，Node 22），由
+  `tsx --test --test-force-exit tests/*.test.ts` 驱动；Deno/Bun/Node 共享同一套
+  `tests/*.test.ts`。
+
+### 变更
+
+- **依赖**：`@dreamer/i18n` ^1.1.2、`@dreamer/runtime-adapter` ^1.2.2、
+  `@dreamer/test` ^1.2.3。
+- **CI**：Deno 升至 v2.9。
+- **发布**：`jsr publish` 不再使用 `--no-check`（更严格的发布门禁）。
+
+---
+
 ## [1.0.2] - 2026-02-19
 
 ### 变更
